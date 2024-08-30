@@ -12,9 +12,8 @@
                             LISTE DES MISSIONS
                         </h1>
                         <div class="page-header-subtitle mt-3">
-                            <a class="btn btn-success" href="#" class="btn btn-success"
-                            data-bs-toggle="modal"
-                                data-bs-target="#formLocataireBackdrop">
+                            <a class="btn btn-success" href="{{ route('gestion_mission.create') }}" class="btn btn-success"
+                            >
                                 Ajouter une nouvelle mission
                             </a>
                         </div>
@@ -77,7 +76,7 @@
                                         <td>{{ $item->date_fin }}</td>
                                         <td>{{ $item->lieu }}</td>
                                         <td class="text-center">
-                                            <a class="text-center" href="{{ route('gestion_mission.show', [$item->id]) }}">
+                                            <a href="#" data-bs-toggle="modal" data-bs-target="#missionDetailsModal{{ $item->id }}">
                                                 <i class="me-2 text-green" data-feather="eye"></i>
                                             </a>
                                         </td>
@@ -85,90 +84,51 @@
                                 @endforeach
                             </tbody>
                         </table>
-
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-    <!-- Modal -->
-    <div class="modal fade" id="formLocataireBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-        aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl">
+<!-- Modals pour chaque mission -->
+@foreach ($collection as $item)
+    <div class="modal fade" id="missionDetailsModal{{ $item->id }}" tabindex="-1" aria-labelledby="missionDetailsModalLabel{{ $item->id }}" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="staticBackdropLabel">Ajouter une maison à l'immeuble
-                    </h5>
+                    <h5 class="modal-title" id="missionDetailsModalLabel{{ $item->id }}">Détails de la mission: {{ $item->lib }}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="row">
-                        <div class="col-lg-12">
-                            <!-- Tabbed dashboard card example-->
-                            <div class="card mb-4">
-                                <div class="card-body">
-                                    <div class="sbp-preview-content">
-                                        <form method="POST" action="">
-                                            @csrf
-                                            <div class="p-2 m-1" style="border: 2px solid rgb(242, 199, 174); border-radius: 5px;">
-                                                <h6 class="m-2 text-center text-danger">Information sur le locataire</h6>
-                                                <div class="row">
-                                                    <div class="col-lg-6 col-md-12">
-                                                        <div class="mb-3">
-                                                            <label>Nom <span class="text-danger">*</span></label>
-                                                            <input class="form-control" name="nom" type="text" placeholder="Henry" required />
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-lg-6 col-md-12">
-                                                        <div class="mb-3">
-                                                            <label>Prénom <span class="text-danger">*</span></label>
-                                                            <input class="form-control" name="prenom" type="text" placeholder="Mitchel" required />
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="col-lg-6 col-md-12">
-                                                        <div class="mb-3">
-                                                            <label>N° CNIB ou Passport<span class="text-danger">*</span></label>
-                                                            <input class="form-control" name="cnib" type="text" placeholder="B13649564" required />
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-lg-6 col-md-12">
-                                                        <div class="mb-3">
-                                                            <label>Téléphone<span class="text-danger">*</span></label>
-                                                            <input class="form-control" name="telephone" type="text" placeholder="67186063" required />
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="col-lg-6 col-md-12">
-                                                        <div class="mb-3">
-                                                            <label>Quartier</label>
-                                                            <input class="form-control" name="quartier" type="text" placeholder="ex: Wemtenga" />
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-lg-6 col-md-12">
-                                                        <div class="mb-3">
-                                                            <label>Proffession</label>
-                                                            <input class="form-control" name="profession" type="text" placeholder="ex: fonctionnaire d'etat" />
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="mt-3">
-                                                <button type="submit" class="btn btn-success">Enregistrer</button>
-                                                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Fermer</button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="col-md-6">
+                            <p><strong>Code:</strong> {{ $item->code }}</p>
+                            <p><strong>Intitulé de la mission:</strong> {{ $item->lib }}</p>
+                            <p><strong>Consigne:</strong> {{ $item->consigne }}</p>
+                            <p><strong>Date début:</strong> {{ $item->date_debut }}</p>
+                            <p><strong>Date de signature:</strong> {{ $item->date_signature }}</p>
+                            <p><strong>Date fin:</strong> {{ $item->date_fin }}</p>
+                            <p><strong>Lieu:</strong> {{ $item->lieu }}</p>
                         </div>
+                        <div class="col-md-6">
+                            <h6><strong>Personnels associés:</strong></h6>
+                            <ul>
+                                @foreach($item->personnels as $personnel)
+                                    <li>{{ $personnel->nom }} {{ $personnel->prenom }} - {{ $personnel->fonction }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Ajouter ici d'autres champs pertinents si nécessaire -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+@endforeach
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+
+
 @endsection

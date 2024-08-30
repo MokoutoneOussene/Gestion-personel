@@ -15,7 +15,8 @@ class MissionController extends Controller
     {
        // on doit compacter les données de la table personnel à la vue appelée d'ou compact('collection')
        $collection = Mission::latest()->get();
-       return view('pages.mission.liste', compact('collection'));
+       $personnels = Personnel::latest()->get();
+       return view('pages.mission.liste', compact('collection', 'personnels'));
     }
 
     /**
@@ -23,7 +24,8 @@ class MissionController extends Controller
      */
     public function create()
     {
-        return view('pages.mission.ajouter');
+        $personnels = Personnel::latest()->get();
+        return view('pages.mission.ajouter', compact( 'personnels'));
     }
 
     /**
@@ -31,18 +33,45 @@ class MissionController extends Controller
      */
     public function store(Request $request)
     {
-        Mission::create([
-            'lib' => $request->lib,
-            'code' => $request->code,
-            'consigne' => $request->consigne,
-            'date_signature' => $request->date_signature,
-            'lieu' => $request->lieu,
-            'date_debut' => $request->date_debut,
-            'date_fin' => $request->date_fin,
-            'tache' => $request->tache,
-        ]);
+       // Validation des données
+    $request->validate([
+        'code' => 'nullable|string',
+        'lib' => 'nullable|string',
+        'consigne' => 'nullable|string',
+        'date_signature' => 'required|date',
+        'lieu' => 'nullable|string',
+        'date_debut' => 'required|date',
+        'date_fin' => 'required|date',
+        'personnels' => 'nullable|array',
+    ]);
 
-        return redirect()->back();
+    $mission = new Mission();
+    $mission->code = $request->code;
+    $mission->lib = $request->lib;
+    $mission->consigne = $request->consigne;
+    $mission->date_signature = $request->date_signature;
+    $mission->lieu = $request->lieu;
+    $mission->date_debut = $request->date_debut;
+    $mission->date_fin = $request->date_fin;
+    $mission->save();
+
+    if ($request->personnel_ids) {
+        $personnelIds = $request->personnel_ids;
+        $roles = $request->roles;
+        $tasks = $request->tasks;
+
+        foreach ($personnelIds as $index => $personnelId) {
+            // Vérifiez si l'index existe dans les autres tableaux
+            if (isset($roles[$index]) && isset($tasks[$index])) {
+                $mission->personnels()->attach($personnelId, [
+                    'role' => $roles[$index],
+                    'task' => $tasks[$index]
+                ]);
+            }
+        }
+    }
+
+    return redirect()->route('gestion_mission.index')->with('success', 'Mission ajoutée avec succès');
     }
 
     /**

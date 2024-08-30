@@ -11,4 +11,11 @@ class Personnel extends Model
     protected $guarded = [
 
     ];
+
+    public function missions()
+    {
+        return $this->belongsToMany(Mission::class, 'mission_personnel')
+            ->withPivot('role', 'task')
+            ->withTimestamps();
+    }
 }

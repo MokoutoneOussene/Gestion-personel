@@ -20,8 +20,6 @@ return new class extends Migration
             $table->string('lieu')->nullable();
             $table->date('date_debut');
             $table->date('date_fin');
-            $table->string('tache')->nullable();
-            $table->foreignId('personnel_missions_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
             $table->timestamps();
         });
     }
